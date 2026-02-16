@@ -19,10 +19,21 @@ from metrics import (
     PersonDetectionMetric
 )
 
+# Import cinematic metrics
+from metrics.cinematic import (
+    CameraMovementMetric,
+    StabilizationMetric,
+    FocusChangeMetric,
+    LightingTypeMetric,
+    ColorGradingMetric,
+    ExposureMetric,
+    ShotFramingMetric
+)
+
 
 class MetricsManager:
     """
-    Manages all metric calculations.
+    Manages all metric calculations including cinematic metrics.
     
     Automatically loads all available metrics and provides
     a unified interface for calculating them.
@@ -30,7 +41,7 @@ class MetricsManager:
     
     def __init__(self):
         """Initialize all metric calculators"""
-        # Initialize all metrics
+        # Initialize basic metrics
         self.metrics = {
             'sharpness': SharpnessMetric(),
             'brightness': BrightnessMetric(),
@@ -40,6 +51,20 @@ class MetricsManager:
             'composition': CompositionMetric(),
             'person_detection': PersonDetectionMetric(),
         }
+        
+        # Initialize cinematic metrics
+        self.cinematic_metrics = {
+            'camera_movement': CameraMovementMetric(),
+            'stabilization': StabilizationMetric(),
+            'focus_change': FocusChangeMetric(),
+            'lighting_type': LightingTypeMetric(),
+            'color_grading': ColorGradingMetric(),
+            'exposure': ExposureMetric(),
+            'shot_framing': ShotFramingMetric(),
+        }
+        
+        # Merge all metrics
+        self.metrics.update(self.cinematic_metrics)
     
     def get_available_metrics(self) -> List[str]:
         """
@@ -49,6 +74,15 @@ class MetricsManager:
             List of metric names
         """
         return list(self.metrics.keys())
+    
+    def get_basic_metrics(self) -> List[str]:
+        """Get list of basic metric names"""
+        return ['sharpness', 'brightness', 'contrast', 'color_vibrancy', 
+                'motion', 'composition', 'person_detection']
+    
+    def get_cinematic_metrics(self) -> List[str]:
+        """Get list of cinematic metric names"""
+        return list(self.cinematic_metrics.keys())
     
     def get_metric_info(self) -> Dict[str, str]:
         """
@@ -62,6 +96,7 @@ class MetricsManager:
             for name, metric in self.metrics.items()
         }
     
+    # Basic metric methods
     def calculate_sharpness(self, frame: np.ndarray) -> float:
         """Calculate sharpness metric"""
         return self.metrics['sharpness'].calculate(frame)
@@ -94,6 +129,35 @@ class MetricsManager:
             Tuple of (person_score, center_focus_score)
         """
         return self.metrics['person_detection'].calculate(frame)
+    
+    # Cinematic metric methods
+    def calculate_camera_movement(self, frame: np.ndarray, prev_frame: np.ndarray) -> dict:
+        """Calculate camera movement analysis"""
+        return self.metrics['camera_movement'].calculate(frame, prev_frame=prev_frame)
+    
+    def calculate_stabilization(self, frame: np.ndarray, prev_frame: np.ndarray) -> dict:
+        """Calculate stabilization quality"""
+        return self.metrics['stabilization'].calculate(frame, prev_frame=prev_frame)
+    
+    def calculate_focus_change(self, frame: np.ndarray, prev_frame: np.ndarray = None) -> dict:
+        """Calculate focus change detection"""
+        return self.metrics['focus_change'].calculate(frame, prev_frame=prev_frame)
+    
+    def calculate_lighting_type(self, frame: np.ndarray) -> dict:
+        """Calculate lighting type classification"""
+        return self.metrics['lighting_type'].calculate(frame)
+    
+    def calculate_color_grading(self, frame: np.ndarray) -> dict:
+        """Calculate color grading style"""
+        return self.metrics['color_grading'].calculate(frame)
+    
+    def calculate_exposure(self, frame: np.ndarray) -> dict:
+        """Calculate exposure quality"""
+        return self.metrics['exposure'].calculate(frame)
+    
+    def calculate_shot_framing(self, frame: np.ndarray) -> dict:
+        """Calculate shot framing type"""
+        return self.metrics['shot_framing'].calculate(frame)
     
     def calculate_all_for_frame(self, frame: np.ndarray, 
                                prev_frame: np.ndarray = None) -> Dict[str, float]:
@@ -135,9 +199,17 @@ class MetricsManager:
         print("Available Metrics")
         print("="*60)
         
-        for name, metric in self.metrics.items():
-            print(f"\n{name}:")
-            print(f"  {metric.get_description()}")
+        print("\nBasic Metrics:")
+        for name in self.get_basic_metrics():
+            metric = self.metrics[name]
+            print(f"  {name}:")
+            print(f"    {metric.get_description()}")
+        
+        print("\nCinematic Metrics:")
+        for name in self.get_cinematic_metrics():
+            metric = self.metrics[name]
+            print(f"  {name}:")
+            print(f"    {metric.get_description()}")
         
         print("\n" + "="*60)
 

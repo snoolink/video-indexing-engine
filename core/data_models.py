@@ -6,9 +6,10 @@ Defines all data structures used throughout the video indexing system.
 Easy to extend with new metrics or fields.
 """
 
+import numpy as np
 from dataclasses import dataclass, asdict
 from typing import Dict
-import numpy as np
+
 
 @dataclass
 class ScoreMetrics:
@@ -18,6 +19,7 @@ class ScoreMetrics:
     Each metric is scored from 0.0 (worst) to 1.0 (best).
     Add new metrics by simply adding new fields here.
     """
+    # Basic visual metrics
     sharpness: float = 0.0
     brightness: float = 0.0
     contrast: float = 0.0
@@ -27,22 +29,56 @@ class ScoreMetrics:
     person_score: float = 0.0
     center_focus_score: float = 0.0
     
+    # Cinematic metrics - Camera Movement
+    camera_movement_type: str = "Static"
+    camera_movement_quality: float = 0.0
+    camera_movement_smoothness: float = 0.0
+    camera_movement_confidence: float = 0.0
+    
+    # Cinematic metrics - Stabilization
+    stabilization_type: str = "unknown"
+    stabilization_score: float = 0.0
+    
+    # Cinematic metrics - Focus
+    focus_has_change: bool = False
+    focus_change_amount: float = 0.0
+    focus_sharpness: float = 0.0
+    focus_has_bokeh: bool = False
+    
+    # Cinematic metrics - Lighting
+    lighting_type: str = "natural"
+    lighting_quality: float = 0.0
+    lighting_is_dramatic: bool = False
+    
+    # Cinematic metrics - Color Grading
+    color_grading_style: str = "neutral"
+    color_grading_strength: float = 0.0
+    color_saturation: float = 0.0
+    color_warmth: float = 0.0
+    
+    # Cinematic metrics - Exposure
+    exposure_quality: str = "properly_exposed"
+    exposure_score: float = 0.0
+    exposure_is_well_exposed: bool = True
+    
+    # Cinematic metrics - Shot Framing
+    shot_framing_type: str = "medium"
+    shot_composition_score: float = 0.0
+    shot_follows_rule_of_thirds: bool = False
+    
     # Example: Add new metrics here
     # face_score: float = 0.0
     # smile_score: float = 0.0
     # symmetry_score: float = 0.0
     
-    # def to_dict(self) -> Dict:
-    #     """Convert to dictionary for JSON serialization"""
-    #     return asdict(self)
     def to_dict(self) -> Dict:
         """Convert to dictionary for JSON serialization"""
-    # Convert all values to native Python types (handle numpy types)
+        # Convert all values to native Python types (handle numpy types)
         return {
-        key: float(value) if isinstance(value, (np.floating, np.integer)) else value
-        for key, value in asdict(self).items()
-    }
-
+            key: float(value) if isinstance(value, (np.floating, np.integer)) else value
+            for key, value in asdict(self).items()
+        }
+    
     @classmethod
     def from_dict(cls, data: Dict):
         """Create ScoreMetrics from dictionary"""
@@ -70,9 +106,9 @@ class VideoSegment:
         """Convert to dictionary for JSON serialization"""
         return {
             'video_file': self.video_file,
-            'start_time': self.start_time,
-            'end_time': self.end_time,
-            'duration': self.duration,
+            'start_time': float(self.start_time),
+            'end_time': float(self.end_time),
+            'duration': float(self.duration),
             'metrics': self.metrics.to_dict()
         }
     
