@@ -1,12 +1,11 @@
-```# Video Indexer - Modular Metrics System
+# Video Indexer - Modular Metrics System
 
 ## 📁 Project Structure
 
-```
+```text
 video_indexer_project/
 ├── index_videos.py              # Main entry point (run this!)
-├
-── core/                         # Core system modules
+├── core/                       # Core system modules
 │   ├── data_models.py           # Data structures (ScoreMetrics, VideoSegment, etc.)
 │   ├── video_reader.py          # Video file I/O operations
 │   ├── segment_processor.py     # Aggregates metrics from frames
@@ -30,14 +29,15 @@ video_indexer_project/
 
 ## 🎯 Key Features
 
-### **1. Fully Modular Metrics**
+### 1. Fully Modular Metrics
 - Each metric is in its own file
 - Add new metrics by creating a new file
 - Remove metrics by deleting the file
 - Modify metrics without touching others
 
-### **2. Clean Architecture**
-```
+### 2. Clean Architecture
+
+```text
 index_videos.py (main)
     ↓
 core/metrics_manager.py (coordinator)
@@ -45,7 +45,7 @@ core/metrics_manager.py (coordinator)
 metrics/*.py (individual calculations)
 ```
 
-### **3. Easy to Extend**
+### 3. Easy to Extend
 Adding a new metric takes 3 simple steps (see below)
 
 ---
@@ -91,7 +91,7 @@ Each metric is in its own file and completely independent:
 
 ### Example: Adding a Face Detection Metric
 
-### **Step 1: Create the Metric File**
+#### Step 1: Create the Metric File
 Create `metrics/face_detection_metric.py`:
 
 ```python
@@ -104,7 +104,6 @@ Detects faces in frames using Haar Cascade.
 import cv2
 import numpy as np
 from .base_metric import BaseMetric
-
 
 class FaceDetectionMetric(BaseMetric):
     """
@@ -140,7 +139,7 @@ class FaceDetectionMetric(BaseMetric):
         return "Detects faces using Haar Cascade classifier"
 ```
 
-### **Step 2: Register in `metrics/__init__.py`**
+#### Step 2: Register in `metrics/__init__.py`
 Add import and export:
 
 ```python
@@ -152,7 +151,7 @@ __all__ = [
 ]
 ```
 
-### **Step 3: Add to `core/data_models.py`**
+#### Step 3: Add to `core/data_models.py`
 Add field to `ScoreMetrics` dataclass:
 
 ```python
@@ -162,7 +161,7 @@ class ScoreMetrics:
     face_score: float = 0.0  # ADD THIS
 ```
 
-### **Step 4: Register in `core/metrics_manager.py`**
+#### Step 4: Register in `core/metrics_manager.py`
 Add to `__init__` and create convenience method:
 
 ```python
@@ -180,7 +179,7 @@ class MetricsManager:
         return self.metrics['face_detection'].calculate(frame)
 ```
 
-### **Step 5: Add to `core/segment_processor.py`**
+#### Step 5: Add to `core/segment_processor.py`
 Update `process_segment()` method:
 
 ```python
@@ -198,7 +197,7 @@ def process_segment(self, frames):
     return metrics
 ```
 
-### **Step 6: Done!**
+#### Step 6: Done!
 Re-run the indexer and your new metric is included:
 
 ```bash
@@ -270,39 +269,39 @@ Save and re-index. That's it!
 
 ## 📋 Module Descriptions
 
-### **core/data_models.py**
+### core/data_models.py
 Data structures used throughout the system:
 - `ScoreMetrics` - Container for all metric scores
 - `VideoSegment` - Segment with timing and metrics
 - `VideoMetadata` - Video file metadata
 - `IndexMetadata` - Index metadata
 
-### **core/video_reader.py**
+### core/video_reader.py
 Handles all video I/O:
 - Read video metadata (fps, duration, resolution)
 - Read segments by frame or time
 - Iterate through all segments
 - Find videos in folder
 
-### **core/segment_processor.py**
+### core/segment_processor.py
 Processes segments:
 - Aggregates frame-level metrics into segment scores
 - Handles frame sampling (every 3rd, every 6th, etc.)
 - Returns ScoreMetrics for each segment
 
-### **core/metrics_manager.py**
+### core/metrics_manager.py
 Coordinates all metrics:
 - Loads all metric modules
 - Provides unified interface
 - Calculates all metrics for a frame
 
-### **metrics/base_metric.py**
+### metrics/base_metric.py
 Base class for all metrics:
 - Defines common interface
 - Provides utility methods (normalize, etc.)
 - All metrics inherit from this
 
-### **metrics/*.py**
+### metrics/*.py
 Individual metric calculations:
 - Each file is independent
 - Inherits from BaseMetric
@@ -312,27 +311,27 @@ Individual metric calculations:
 
 ## 🎨 Benefits of This Structure
 
-### **1. Modularity**
+### 1. Modularity
 - Each metric is completely independent
 - Add/remove/modify without affecting others
 - Easy to understand and maintain
 
-### **2. Extensibility**
+### 2. Extensibility
 - Adding metrics is straightforward
 - Clear patterns to follow
 - No need to modify core logic
 
-### **3. Testability**
+### 3. Testability
 - Test each metric independently
 - Mock dependencies easily
 - Isolate bugs quickly
 
-### **4. Reusability**
+### 4. Reusability
 - Use individual metrics in other projects
 - Mix and match as needed
 - Share metrics between projects
 
-### **5. Collaboration**
+### 5. Collaboration
 - Different developers can work on different metrics
 - Clear ownership of files
 - Easier code reviews
@@ -371,7 +370,7 @@ print(f"Description: {metric.get_description()}")
 
 ## 🚦 Workflow
 
-```
+```text
 1. User runs: python3 index_videos.py videos/ index.json
                     ↓
 2. index_videos.py loads core modules
@@ -451,4 +450,3 @@ This modular structure makes it incredibly easy to:
 - ✅ Understand the system (clear organization!)
 
 **The metrics/ folder is your playground - add as many metrics as you want!**
-```
